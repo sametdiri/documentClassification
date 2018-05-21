@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import static java.util.Collections.list;
 
+
 class sayac{
     int num;
     String ngram;
@@ -26,15 +27,8 @@ class sayac{
 public class Proje3 {
 
     public static void main(String[] args) throws FileNotFoundException, IOException  {
-        //deneme dosyası okuma:    
-            File file = new File("deneme.txt");
-            FileInputStream fis2 = new FileInputStream(file);
-            byte[] data2 = new byte[(int) file.length()];
-            fis2.read(data2);
-            fis2.close();
-            String denenecekHaberMetni2 = new String(data2, "UTF-8");
-            String denenecekHaberMetni = denenecekHaberMetni2.toLowerCase();
-            System.out.println(denenecekHaberMetni);
+  
+    String denenecekHaberMetni = "banka";
 
     ArrayList<Double> ekonomiOlasilik = new ArrayList<>();
     ArrayList<Double> siyasiOlasilik = new ArrayList<>();
@@ -42,26 +36,37 @@ public class Proje3 {
     ArrayList<Double> magazinOlasilik = new ArrayList<>();
     ArrayList<Double> saglikOlasilik = new ArrayList<>();  
  
-    int rnd = 0;
+    int rnd = 0, eslesme =0;
     File klasor1150haber = new File("1150haber");
     File[] list=klasor1150haber.listFiles(); 
 
     //  File kategori[] = new File("1150haber");
     // ArrayList <String> dosyaAdlari = new ArrayList <String> ();
     
-    Map<String, String> dosyaAdlari = new HashMap<String, String>();
+    Map<String, String> testKumesiDosyaAdlariKategorileri = new HashMap<String, String>();
+    Map<String, String> gercekDosyaKategorileri = new HashMap<String, String>();
+    Map<String, String> tahminEdilenDosyaKategorileri = new HashMap<String, String>();
+    
     Map<String, Integer> mapEkonomi = new HashMap<String,Integer>();
     Map<String, Integer> mapMagazin = new HashMap<String,Integer>();
     Map<String, Integer> mapSaglik = new HashMap<String,Integer>();
     Map<String, Integer> mapSiyasi = new HashMap<String,Integer>();
     Map<String, Integer> mapSpor = new HashMap<String,Integer>();
-  
+    
+    Map<String, Integer> testEkonomi = new HashMap<String,Integer>();
+    Map<String, Integer> testMagazin = new HashMap<String,Integer>();
+    Map<String, Integer> testSaglik = new HashMap<String,Integer>();
+    Map<String, Integer> testSiyasi = new HashMap<String,Integer>();
+    Map<String, Integer> testSpor = new HashMap<String,Integer>();
 //dosya ve klasörleri okuma: 
 
   for(int i=0;i<list.length;i++){
    // System.out.println(list[i].getName()+"---------------"); //klasör adlarını yazıyor
     if (list[i].isDirectory()) {
         for (File dosya:list[i].listFiles()){
+            
+            gercekDosyaKategorileri.put(dosya.getName(),list[i].getName());
+            
          //   System.out.println(dosya.getName()); //alt klasörlerdeki dosyaların adlarını yazıyor
            //List<String> lines = Files.readAllLines(Paths.get(dosya.getName()), StandardCharsets.UTF_8);
             //String text = new String(Files.readAllBytes(Paths.get(dosya.getName())), StandardCharsets.UTF_8);
@@ -91,16 +96,11 @@ public class Proje3 {
             if (!buldu2)   v2.add(new sayac(1,y));
         }
         rnd++;
-        if (rnd%4!=1)
-        {   // tamamının 3/4'ü kategorisiz olarak dict.'e atıldı:
-            dosyaAdlari.put(dosya.getName(), str);
-        }
-        else {
-            // test kümesini burada oluştur (1/4)
-        }  
+
+        
         for(int z=0; z<v2.size();z++){
             sayac s3= (sayac)v2.elementAt(z);
-            if (s3.num>=50 && rnd%4!=1) 
+            if (s3.num>=50 && rnd%4!=1)  // eğitim kümesi burada oluşturuluyor 
             {
             //  System.out.println(s3.ngram+";"+s3.num);
                 switch (list[i].getName()){
@@ -121,6 +121,29 @@ public class Proje3 {
                             break;             
                 }
             }
+            if ( rnd%4==1)   // test kümesi burada oluşturuluyor 
+            {
+            
+                    testKumesiDosyaAdlariKategorileri.put(dosya.getName(),list[i].getName());
+                
+                    switch (list[i].getName()){
+                        case "ekonomi": 
+                            testEkonomi.put(s3.ngram, s3.num);
+                            break;
+                        case "magazin": 
+                            testMagazin.put(s3.ngram, s3.num);
+                            break;
+                        case "saglik": 
+                            testSaglik.put(s3.ngram, s3.num);
+                            break;
+                        case "siyasi": 
+                            testSiyasi.put(s3.ngram, s3.num);
+                            break;
+                        case "spor": 
+                            testSpor.put(s3.ngram, s3.num);
+                            break;             
+                }
+            }
         }    
  //          birlesmisMetin.append(str);
           // System.out.println(str);
@@ -129,13 +152,50 @@ public class Proje3 {
     }
   }  
  // String finalString = birlesmisMetin.toString();
- 
+        
         //denenecek haberi n-gramlara ayır 
  
-        Vector v3 = new Vector();
+        
+            
+            
+            /*
+           sayac1 = 0;
+            for (Map.Entry<String, String> entry : gercekDosyaKategorileri.entrySet())
+        {
+            System.out.println(entry.getKey() + " -- " + entry.getValue());
+            sayac1++;
+            System.out.println("sayaç :    "+sayac1);
+        }
+            sayac1 = 0;
+            for (Map.Entry<String, String> entry : testKumesiDosyaAdlariKategorileri.entrySet())
+        {
+            System.out.println(entry.getKey() + " -- " + entry.getValue());
+            sayac1++;
+            System.out.println("sayaç :    "+sayac1);
+        }
+            */
+
+            int sayac5 = 0;
+            
+            for(int i=0;i<list.length;i++){ // test kümesine işlem yapma döngüsü
+              //System.out.println(list[i].getName()+"---------------"); //klasör adlarını yazıyor
+                 if (list[i].isDirectory()) {
+                      for (File dosya:list[i].listFiles()){
+                          if (testKumesiDosyaAdlariKategorileri.containsKey(dosya.getName())) {
+                              
+
+                              //test kümesi dosyasını okuma:
+                              FileInputStream fis4 = new FileInputStream(dosya);
+                              byte[] data4 = new byte[(int) dosya.length()];
+                              fis4.read(data4);
+                              fis4.close();
+                              String str4 = new String(data4, "UTF-8");
+                              String str3 = str4.toLowerCase();
+                              
+                              Vector v3 = new Vector();
         int m=2;
-        for (int j=0;j<denenecekHaberMetni.length()-m+1;j++) {
-            String y = denenecekHaberMetni.substring(j,j+m);
+        for (int j=0;j<str3.length()-m+1;j++) {
+            String y = str3.substring(j,j+m);
             boolean buldu2 = false;
             for(int h=0;h<v3.size();h++) {
                 sayac s2= (sayac)v3.elementAt(h);
@@ -150,9 +210,17 @@ public class Proje3 {
         int sayac1=0;
         int pEkonomi=0,pMagazin=0,pSiyasi=0,pSpor=0,pSaglik=0,olasilik=0;
         double toplam = 0;
+        
+        ekonomiOlasilik.clear();
+        siyasiOlasilik.clear();
+        sporOlasilik.clear();
+        saglikOlasilik.clear();
+        magazinOlasilik.clear();
+        
+        
         for(int z=0; z<v3.size();z++){
             sayac s2= (sayac)v3.elementAt(z);
-            System.out.println("Aranacak metindeki : "+s2.ngram+";"+s2.num);
+            System.out.println("Aranacak metindeki ngram -------- : "+s2.ngram+";"+s2.num);
             //int ekonomideBulunan = 0;
                 for (Map.Entry<String, Integer> entry : mapEkonomi.entrySet())
                 {/*
@@ -221,59 +289,30 @@ public class Proje3 {
             sporOlasilik.add(pSpor/toplam);
             magazinOlasilik.add(pMagazin/toplam);
             saglikOlasilik.add(pSaglik/toplam);
-           
-            System.out.println("ekonomi olasılık :///////////////"+ pEkonomi/toplam);
-            System.out.println("siyasi olasılık :///////////////"+ pSiyasi/toplam);
-            System.out.println("spor olasılık :///////////////"+ pSpor/toplam);
-            System.out.println("magazin olasılık :///////////////"+ pMagazin/toplam);
-            System.out.println("saglik olasılık :///////////////"+ pSaglik/toplam);
-
+            
+            
+            System.out.println("ekonomi olasılık : "+ pEkonomi/toplam);
+            System.out.println("spor olasılık : "+ pSpor/toplam);
+            System.out.println("magazin olasılık : "+ pMagazin/toplam);
+            System.out.println("saglik olasılık : "+ pSaglik/toplam);
+            System.out.println("siyasi olasılık : "+ pSiyasi/toplam);
             
             
             }
             
         //deneme 
-        for (double d : ekonomiOlasilik) System.out.println("*************  "+d);
+      //  for (double d : ekonomiOlasilik) System.out.println("*************  "+d);
+        
+       
         
         
-//   kategorilendirilerek farklı dict.'lere atılan eğitim kısmında istenen haberin
-//   n-gramlarını ara:
-/*
-        sayac1=0;
-        for (Map.Entry<String, Integer> entry : mapMagazin.entrySet())
-        {
-            System.out.println(entry.getKey() + " -- " + entry.getValue());
-            sayac1++;
-            System.out.println("sayaç : Magazin   "+sayac1);
-        }
-        sayac1=0;
-        for (Map.Entry<String, Integer> entry : mapSaglik.entrySet())
-        {
-            System.out.println(entry.getKey() + " -- " + entry.getValue());
-            sayac1++;
-            System.out.println("sayaç : Saglik   "+sayac1);
-        }
-        sayac1=0;
-        for (Map.Entry<String, Integer> entry : mapSpor.entrySet())
-        {
-            System.out.println(entry.getKey() + " -- " + entry.getValue());
-            sayac1++;
-            System.out.println("sayaç : Spor   "+sayac1);
-        }
-        sayac1=0;
-        for (Map.Entry<String, Integer> entry : mapSiyasi.entrySet())
-        {
-            System.out.println(entry.getKey() + " -- " + entry.getValue());
-            sayac1++;
-            System.out.println("sayaç : Siyasi   "+sayac1);
-        }
-  */      
+        
             Map<String, Double> olasiliklar = new HashMap<String,Double>();
             double carpim = 1.0;
             for (double deger: ekonomiOlasilik){
                 
             if (deger>0) carpim*=deger;
-            System.out.println("------------------------- "+deger+" "+ carpim );
+            System.out.println("------------ "+deger+" "+ carpim );
             }
             olasiliklar.put("ekonomi", carpim);
             
@@ -307,6 +346,7 @@ public class Proje3 {
         {
             olasilikToplam += kategori.getValue();
         }
+        olasilikToplam *= 0.2; //naive bayes genel olasılık çarpımı yani 1/5
         for (Map.Entry<String, Double> kategori : olasiliklar.entrySet())
         {  
                 System.out.println("kategori value : "+kategori.getValue());
@@ -321,6 +361,53 @@ public class Proje3 {
         }
             
             System.out.println("En büyük ihtimal : "+maxKategorisi);
+            System.out.println("gerçek klasör : "+list[i].getName());
+          
+            if (maxKategorisi.equals(list[i].getName())) {
+                eslesme++;
+            }
+          //  testKumesiDosyaAdlariKategorileri
+          //  if (maxKategorisi == )                  
+                              
+                          }  //contains true dönüş parantezi 
+                            
+                      }
+                 }
+            }
+            
+            
+        /*     for (Map.Entry<String, String> entry : testKumesiDosyaAdlariKategorileri.entrySet())
+        {
+            System.out.println(entry.getKey()+"___________"+entry.getValue());
+            
+            File file3 = new File("1150haber/"+entry.getKey()+"/"+entry.getValue());
+            FileInputStream fis3 = new FileInputStream(file3);
+            byte[] data3 = new byte[(int) file3.length()];
+            fis3.read(data3);
+            fis3.close();
+            String denenecekHaberMetni3 = new String(data3, "UTF-8");
+            String denenecekHaberMetni4 = denenecekHaberMetni3.toLowerCase();
+            System.out.println(denenecekHaberMetni4);
+        }*/
+            
+            
+        //hesaplamalar 
+        
+        double tumTestKumesi = testKumesiDosyaAdlariKategorileri.size();
+        double TPdegeri = eslesme;
+        double FNdegeri = tumTestKumesi-TPdegeri;
+        double recall = TPdegeri/FNdegeri;
+        double precision = TPdegeri / tumTestKumesi;                 //TPdegeri/(0.2);
+        double fMeasure = 2 * recall * precision / (recall+precision);
+        
+        
+        
+        System.out.println("--------------------------------------------------");
+        
+        System.out.println("Recall Değeri : "+recall);
+        System.out.println("Precision Değeri : "+precision);
+        System.out.println("F-Measure Değeri : "+fMeasure);
+        
 
         }//main parantezi
 }
